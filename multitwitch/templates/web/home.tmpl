@@ -21,6 +21,7 @@
   })();
 </script>
 <script type="text/javascript">
+var twitchParents = [{% for parent_host in twitch_parent_hosts %}"{{ parent_host|e }}"{% if not loop.last %}, {% endif %}{% endfor %}];
 $(document).ready(function() {
     absolute_center($("#helpbox"));
     if ({{ nstreams }} == 0) {
@@ -49,10 +50,20 @@ $(window).resize(function() {
 </head>
 <body>
 <div id="wrapper">
+{% if flash_messages %}
+<div id="flash_messages">
+{% for flash in flash_messages %}
+    <div class="flash_message {{ flash.level|e }}">{{ flash.message|e }}</div>
+{% endfor %}
+</div>
+{% endif %}
 <div id="streams">
     {% for stream in streams %}
 
-    <iframe id="embed_{{ stream|e }}" src="https://player.twitch.tv/?muted=true&channel={{ stream|e }}&parent=multitwitch.tv&parent=www.multitwitch.tv" class="stream" allowfullscreen="true"></iframe>
+    <div class="stream_tile" data-stream-name="{{ stream|e }}">
+        <button type="button" class="stream_close" onclick="close_stream_by_button(this)" title="Close stream">x</button>
+        <iframe id="embed_{{ stream|e }}" src="https://player.twitch.tv/?muted=true&channel={{ stream|e }}{% for parent_host in twitch_parent_hosts %}&parent={{ parent_host|e }}{% endfor %}" class="stream" allowfullscreen="true"></iframe>
+    </div>
 
     {% endfor %}
 </div>
@@ -65,7 +76,7 @@ $(window).resize(function() {
 </ul>
 {% for stream in unique_streams %}
 <div id="chat-{{ stream|e }}" class="stream_chat">
-<iframe frameborder="0" scrolling="no" id="chat-{{ stream|e }}-embed" src="https://twitch.tv/embed/{{ stream|e }}/chat?parent=multitwitch.tv&amp;parent=www.multitwitch.tv{% if darkmode %}&darkpopout{% endif %}" height="100%" width="100%"></iframe>
+<iframe frameborder="0" scrolling="no" id="chat-{{ stream|e }}-embed" src="https://twitch.tv/embed/{{ stream|e }}/chat?{% for parent_host in twitch_parent_hosts %}parent={{ parent_host|e }}{% if not loop.last %}&amp;{% endif %}{% endfor %}{% if darkmode %}&darkpopout{% endif %}" height="100%" width="100%"></iframe>
 </div>
 {% endfor %}
 </div>
@@ -83,25 +94,48 @@ Created by Brian Hamrick
 </div>
 
 <div id="change_streams" class="optionbox">
-    <div id="streamlist">
-    {% for stream in streams %}
-    <div class="streamlist_item">
-    <input type="checkbox" checked=true class="check" />
-    <span>{{ stream|e }}</span>
-    </div>
-    {% endfor %}
-    <div class="streamlist_item">
-    <input type="text" class="stream_name" onkeyup="stream_item_keyup(event)" />
-    </div>
+    <div class="change_streams_section">
+        <div class="optionbox_title">Current Streams</div>
+        <div id="streamlist">
+        {% for stream in streams %}
+        <div class="streamlist_item">
+        <input type="checkbox" checked=true class="check" />
+        <span>{{ stream|e }}</span>
+        </div>
+        {% endfor %}
+        <div class="streamlist_item">
+        <input type="text" class="stream_name" onkeyup="stream_item_keyup(event)" />
+        </div>
+        </div>
+
+        <div class="fullwidth centering add_stream_row">
+            <button type="button" class="action_button secondary_button" onclick="add_stream_item()">Add Stream</button>
+        </div>
     </div>
 
-    <div class="fullwidth centering">
-        <a onclick="add_stream_item()">Add Stream</a>
+    <div class="change_streams_section followed_section">
+        <div class="optionbox_title">Followed Channels</div>
+        {% if twitch_auth_connected %}
+        <div id="followed_channels_status">
+            Connected as <strong>{{ twitch_user.login|e }}</strong>
+        </div>
+        <input type="text" id="followed_channels_filter" class="followed_channels_filter" placeholder="Filter by name, game, or title" onkeyup="filter_followed_channels()" />
+        <div id="followed_channels_list"></div>
+        {% elif twitch_configured %}
+        <div id="followed_channels_status">
+            <a href="/auth/twitch/login?next={{ twitch_next|e }}">Connect Twitch</a> to load the channels you follow.
+        </div>
+        <div id="followed_channels_list"></div>
+        {% else %}
+        <div id="followed_channels_status">
+            Twitch integration is not configured on the server yet.
+        </div>
+        {% endif %}
     </div>
 
-    <div class="fullwidth">
-    <button type="button" class="left" onclick="close_change_streams(false)">Cancel</button>
-    <button type="button" class="right" onclick="close_change_streams(true)">Ok</button>
+    <div class="fullwidth change_streams_actions">
+    <button type="button" class="action_button secondary_button left" onclick="close_change_streams(false)">Cancel</button>
+    <button type="button" class="action_button primary_button right" onclick="close_change_streams(true)">Apply</button>
     <div class="clear"></div>
     </div>
 </div>
@@ -110,6 +144,12 @@ Created by Brian Hamrick
 <a onclick="change_streams()">Change Streams</a>
 |
 <a onclick="toggle_chat()">Toggle Chat</a>
+|
+{% if twitch_auth_connected %}
+<a href="/auth/twitch/logout?next={{ twitch_next|e }}">Disconnect Twitch</a>
+{% else %}
+<a href="/auth/twitch/login?next={{ twitch_next|e }}">Connect Twitch</a>
+{% endif %}
 </div>
 
 </div>

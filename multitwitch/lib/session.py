@@ -22,7 +22,11 @@ def web(template=None, content_type='text/html', *args, **kwargs):
                 body = tmpl.render(data)
             else:
                 body = data
-            return Response(body, content_type=content_type)
+            return Response(
+                body=body.encode('utf-8'),
+                content_type=content_type,
+                charset='utf-8',
+            )
         return staticmethod(wrapper)
     return decorator
 
@@ -36,8 +40,9 @@ def ajax(*args, **kwargs):
         def wrapper(request):
             retval = f(request)
             return Response(
-                    body=json.dumps(retval),
-                    content_type='application/json'
-                    )
+                body=json.dumps(retval).encode('utf-8'),
+                content_type='application/json',
+                charset='utf-8',
+            )
         return staticmethod(wrapper)
     return decorator

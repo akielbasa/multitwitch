@@ -16,8 +16,11 @@ a:hover {
 }
 
 #streams {
-    text-align: center;
+    align-content: flex-start;
+    display: flex;
     float: left;
+    flex-wrap: wrap;
+    justify-content: center;
     margin: 0;
     margin-right: -100px;
     padding: 0;
@@ -25,6 +28,35 @@ a:hover {
 
 iframe {
     border:0 none;
+}
+
+.stream_tile {
+    display: block;
+    flex: 0 0 auto;
+    margin: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.stream_close {
+    background: rgba(0,0,0,0.72);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 999px;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+    height: 24px;
+    line-height: 20px;
+    padding: 0;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 24px;
+    z-index: 2;
+}
+
+.stream_close:hover {
+    background: rgba(180,68,68,0.9);
 }
 
 #chatbox {
@@ -81,29 +113,216 @@ iframe {
     bottom: 12px;
 }
 
+#flash_messages {
+    left: 8px;
+    position: absolute;
+    top: 8px;
+    width: 360px;
+    z-index: 10;
+}
+
+.flash_message {
+    background: rgba(0,0,0,0.85);
+    border: 1px solid #666;
+    margin-bottom: 6px;
+    padding: 8px 10px;
+}
+
+.flash_message.error {
+    border-color: #b44444;
+}
+
+.flash_message.success {
+    border-color: #4b8e0b;
+}
+
 .optionbox {
     z-index: 5;
     display: none;
-    background: rgba(0,0,0,0.65);
-    padding: 5px;
+    background: rgba(8,10,14,0.82);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+    padding: 18px;
     margin: 0 auto;
-    border: 2px solid white;
-    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 16px;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     position: absolute;
+    backdrop-filter: blur(8px);
 }
 
 #change_streams {
-    width: 127px;
+    height: 70vh;
+    max-height: 80vh;
+    min-height: 70vh;
+    overflow-y: auto;
+    width: 520px;
+}
+
+.optionbox_title {
+    color: #f4f1ea;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.change_streams_section {
+    margin-bottom: 18px;
+    padding: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+}
+
+.followed_section {
+    margin-bottom: 14px;
+}
+
+#followed_channels_status {
+    color: #d5d7dc;
+    margin-bottom: 10px;
+}
+
+.followed_channels_filter {
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: white;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    width: 100%;
+}
+
+.followed_channels_filter:focus,
+.streamlist_item .stream_name:focus {
+    border-color: rgba(231,97,24,0.8);
+    box-shadow: 0 0 0 2px rgba(231,97,24,0.18);
+    outline: none;
+}
+
+#followed_channels_list {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.change_streams_actions {
+    margin-top: 14px;
+}
+
+.followed_channel {
+    border-top: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.02);
+    border-left: 0 none;
+    border-right: 0 none;
+    border-bottom: 0 none;
+    color: white;
+    cursor: pointer;
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    text-align: left;
+    width: 100%;
+}
+
+.followed_channel:first-child {
+    border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.followed_channel:hover {
+    background: rgba(255,255,255,0.10);
+}
+
+.followed_channel_name_row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.followed_channel_link {
+    color: #f4f1ea;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.followed_channel_badge {
+    border-radius: 999px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+}
+
+.followed_channel_badge.live {
+    background: #b44444;
+}
+
+.followed_channel_badge.offline {
+    background: #555;
+}
+
+.followed_channel_meta {
+    color: #ccc;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.followed_channel.empty {
+    color: #ccc;
+}
+
+.streamlist_item {
+    align-items: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 10px 12px;
 }
 
 .streamlist_item .stream_name {
-    width: 123px;
+    background: transparent;
+    border: 0 none;
+    color: white;
+    width: 100%;
 }
 
 .fullwidth {
     width: 100%;
+}
+
+.add_stream_row {
+    margin-top: 10px;
+}
+
+.action_button {
+    border: 0 none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px 16px;
+}
+
+.primary_button {
+    background: #e76118;
+    color: white;
+}
+
+.primary_button:hover {
+    background: #ff7b2f;
+}
+
+.secondary_button {
+    background: rgba(255,255,255,0.10);
+    color: white;
+}
+
+.secondary_button:hover {
+    background: rgba(255,255,255,0.18);
 }
 
 .left {
